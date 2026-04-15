@@ -71,12 +71,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const books = ref([])
 const loading = ref(true)
 const error = ref(null)
 const router = useRouter()
+const route = useRoute()
 
 const toast = ref({
   show: false,
@@ -148,8 +149,18 @@ const editBook = (id) => {
   router.push(`/edit/${id}`)
 }
 
-onMounted(() => {
-  fetchBooks()
+onMounted(async () => {
+  await fetchBooks()
+
+  const toastData = sessionStorage.getItem("book-toast")
+
+  if (toastData) {
+    const toast = JSON.parse(toastData)
+
+    showToast(toast.message, toast.type)
+
+    sessionStorage.removeItem("book-toast")
+  }
 })
 </script>
 <!--chwaya style -->
