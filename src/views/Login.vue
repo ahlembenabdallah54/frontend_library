@@ -125,6 +125,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { setUser } from '../stores/auth'   // ✅ NEW
 
 const router = useRouter()
 
@@ -145,17 +146,26 @@ const handleLogin = async () => {
 
     const token = response.data.access_token
 
+    // ✅ Decode JWT to extract user info
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    console.log('JWT payload:', payload) // 👈 check this in browser console once, then remove
+
     if (rememberMe.value) {
       localStorage.setItem('token', token)
     } else {
       sessionStorage.setItem('token', token)
     }
 
+    // ✅ Save user name so navbar can display it
+    setUser({
+      name: payload.name || payload.username || payload.sub
+    })
+
     router.push('/')
 
   } catch (err) {
     if (err.response?.status === 404) {
-      error.value = err.response.data.message  // "Identifiant inexistant" or "Mot de passe erroné"
+      error.value = err.response.data.message
     } else {
       error.value = 'Something went wrong. Please try again.'
     }
@@ -164,6 +174,7 @@ const handleLogin = async () => {
   }
 }
 </script>
+
 
 <style scoped>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

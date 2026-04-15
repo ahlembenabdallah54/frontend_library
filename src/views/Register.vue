@@ -59,6 +59,14 @@
             </div>
           </div>
 
+          <div v-if="success" class="success-box">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            {{ success }}
+          </div>
+
           <div v-if="error" class="error-box">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             {{ error }}
@@ -111,9 +119,12 @@ const router = useRouter()
 const form = ref({ username: '', email: '', password: '', confirmPassword: '' })
 const loading = ref(false)
 const error = ref('')
+const success = ref('')
 
 const handleRegister = async () => {
   error.value = ''
+  success.value = ''
+
   if (form.value.password !== form.value.confirmPassword) {
     error.value = 'Passwords do not match'
     return
@@ -122,6 +133,7 @@ const handleRegister = async () => {
     error.value = 'Password must be at least 6 characters'
     return
   }
+
   loading.value = true
   try {
     await axios.post('http://localhost:3000/auth/signup', {
@@ -129,8 +141,8 @@ const handleRegister = async () => {
       email: form.value.email,
       password: form.value.password
     })
-    alert('Account created successfully! You can now login.')
-    router.push('/login')
+    success.value = 'Account created successfully! Redirecting to login...'
+    setTimeout(() => router.push('/login'), 2000)
   } catch (err) {
     if (err.response?.status === 409) error.value = 'Email or username already exists'
     else if (err.response?.data?.message) error.value = err.response.data.message
@@ -300,6 +312,19 @@ const handleRegister = async () => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+}
+
+.success-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 15px;
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 10px;
+  color: #4ADE80;
+  font-size: 13.5px;
+  margin-bottom: 4px;
 }
 
 .error-box {
