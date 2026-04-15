@@ -7,9 +7,14 @@
       </button>
     </div>
 
-    <div v-if="loading" class="loading">Loading books...</div>
+    <div v-if="loading && books.length === 0" class="loading">
+      Loading books...
+    </div>
+    <div v-if="toast.show" :class="['toast', toast.type]">
+      {{ toast.message }}
+    </div>
 
-    <table v-else class="book-table">
+    <table class="book-table" v-if="books.length">
       <thead>
         <tr>
           <th>Title</th>
@@ -35,13 +40,29 @@
             <button class="btn btn-edit" @click="editBook(book.id)">
               Edit
             </button>
-            <button class="btn btn-delete" @click="deleteBook(book.id)">
+            <button class="btn btn-delete" @click="askDelete(book.id)">
               Delete
             </button>
           </td>
         </tr>
       </tbody>
     </table>
+    <!--modal of delete confirmation-->
+          <div v-if="showConfirm" class="modal-overlay">
+            <div class="modal">
+              <h3>Delete Book</h3>
+              <p>Are you sure you want to delete this book?</p>
+
+              <div class="modal-actions">
+                <button class="btn-cancel" @click="showConfirm = false">
+                  Cancel
+                </button>
+              <button class="btn btn-delete" @click="confirmDelete">
+                Delete
+              </button>
+              </div>
+            </div>
+          </div>
 
     <p v-if="error" class="error-message">{{ error }}</p>
   </div>
@@ -56,6 +77,21 @@ const books = ref([])
 const loading = ref(true)
 const error = ref(null)
 const router = useRouter()
+
+const toast = ref({
+  show: false,
+  message: "",
+  type: "success"
+})
+const showToast = (message, type = "success") => {
+  toast.value.message = message
+  toast.value.type = type
+  toast.value.show = true
+
+  setTimeout(() => {
+    toast.value.show = false
+  }, 2500)
+}
 
 // Convert image path to full URL
 const getImageUrl = (image) => {
@@ -83,16 +119,27 @@ const goToAdd = () => {
 }
 
 // Delete book
-const deleteBook = async (id) => {
-  if (!confirm('Are you sure you want to delete this book?')) return
+const showConfirm = ref(false)
+const selectedId = ref(null)
+
+const askDelete = (id) => {
+  selectedId.value = id
+  showConfirm.value = true
+}
+
+const confirmDelete = async () => {
+  const id = selectedId.value
+  showConfirm.value = false
+
+  const previousBooks = [...books.value]
+  books.value = books.value.filter(b => b.id !== id)
 
   try {
-    await axios.delete(`http://localhost:3000/books/${id}`)
-    // Optimistic update
-    books.value = books.value.filter((book) => book.id !== id)
+    await axios.delete(`http://localhost:3000/books/delete/${id}`)
+    showToast("Book deleted successfully", "success")
   } catch (err) {
-    console.error('Error deleting book:', err)
-    error.value = 'Failed to delete the book.'
+    books.value = previousBooks
+    showToast("Failed to delete book", "error")
   }
 }
 
@@ -274,5 +321,75 @@ tbody tr td:last-child {
     width: 50px;
     height: 70px;
   }
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  animation: slideIn 0.1s ease;
+  z-index: 9999;
+}
+
+.toast.success {
+  background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.toast.error {
+  background: linear-gradient(135deg, #ef4444, #f87171);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.btn-cancel {
+  background: #ddd;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.btn-confirm {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
 }
 </style>
