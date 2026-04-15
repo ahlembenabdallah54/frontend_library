@@ -1,7 +1,3 @@
-<script setup>
-import HelloWorld from './components/AddBook.vue'
-</script>
-
 <template>
-  <HelloWorld />
+  <router-view />
 </template>

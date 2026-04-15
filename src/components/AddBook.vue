@@ -7,7 +7,7 @@
       </div>
 
       <form @submit.prevent="addBook" novalidate>
-        <!-- TITLE -->
+        <!-- title -->
         <div class="form-group">
           <label for="title">Title</label>
           <input
@@ -19,7 +19,7 @@
           />
         </div>
 
-        <!-- YEAR + EDITOR -->
+        <!-- year & author -->
         <div class="form-row">
           <div class="form-group">
             <label for="year">Publication Year</label>
@@ -27,9 +27,9 @@
               id="year"
               v-model.number="form.year"
               type="number"
-              placeholder="1925"
               min="1000"
               max="2100"
+              placeholder="1925"
               required
             />
           </div>
@@ -46,18 +46,17 @@
           </div>
         </div>
 
-        <!-- COVER IMAGE -->
+        <!-- img upload-->
         <div class="form-group">
-          <label for="image">Cover Image URL </label>
+          <label>Cover Image</label>
           <input
-            id="image"
-            v-model.trim="form.image"
-            type="url"
-            placeholder="https://example.com/book-cover.jpg"
+            type="file"
+            @change="handleFile"
+            accept="image/*"
           />
         </div>
 
-        <!-- SUBMIT BUTTON -->
+        <!-- SUBMIT -->
         <button type="submit" :disabled="isLoading" class="submit-btn">
           {{ isLoading ? "Adding Book..." : "Add Book" }}
         </button>
@@ -67,6 +66,7 @@
       <div v-if="successMessage" class="message success">
         {{ successMessage }}
       </div>
+
       <div v-if="errorMessage" class="message error">
         {{ errorMessage }}
       </div>
@@ -78,17 +78,27 @@
 import { reactive, ref } from "vue"
 import axios from "axios"
 
+/* FORM DATA */
 const form = reactive({
   title: "",
   year: null,
-  editor: "",
-  image: ""
+  editor: ""
 })
 
+/* FILE */
+const file = ref(null)
+
+/* UI STATES */
 const successMessage = ref("")
 const errorMessage = ref("")
 const isLoading = ref(false)
 
+/* HANDLE FILE */
+const handleFile = (event) => {
+  file.value = event.target.files[0]
+}
+
+/* ADD BOOK */
 const addBook = async () => {
   successMessage.value = ""
   errorMessage.value = ""
@@ -97,51 +107,54 @@ const addBook = async () => {
   const editor = form.editor.trim()
   const year = Number(form.year)
 
-  // Client-side validation
-  if (!title || !editor || !year || isNaN(year) || year < 1000 || year > 2100) {
+  // validation
+  if (!title || !editor || !year || isNaN(year)) {
     errorMessage.value = "Please fill all required fields correctly"
     return
   }
 
   if (isLoading.value) return
-
   isLoading.value = true
 
   try {
-    const payload = {
-      title,
-      year,
-      editor,
-      image: form.image ? form.image.trim() : null
+    const formData = new FormData()
+
+    formData.append("title", title)
+    formData.append("year", year)
+    formData.append("editor", editor)
+
+    if (file.value) {
+      formData.append("image", file.value)
     }
 
-    await axios.post("http://localhost:3000/books/new", payload)
-
-    successMessage.value = "Book added successfully!"
-
-    // Reset form
-    Object.assign(form, {
-      title: "",
-      year: null,
-      editor: "",
-      image: ""
+    await axios.post("http://localhost:3000/books/new", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
     })
+
+    successMessage.value = "Book added successfully! "
+
+    // RESET FORM
+    form.title = ""
+    form.year = null
+    form.editor = ""
+    file.value = null
+
+    // reset file input visually
+    document.querySelector('input[type="file"]').value = ""
 
   } catch (error) {
     console.error("Add book error:", error)
 
-    if (Array.isArray(error.response?.data?.message)) {
-      errorMessage.value = error.response.data.message.join(", ")
-    } else {
-      errorMessage.value =
-        error.response?.data?.message ||
-        "Failed to add the book. Please try again."
-    }
+    errorMessage.value =
+      error.response?.data?.message ||
+      "Failed to add book"
   } finally {
     isLoading.value = false
   }
 }
-</script>
+</script>>
 
 <style scoped>
 .container {
