@@ -30,7 +30,7 @@ npm install
 
 # Start development server
 npm run dev
-
+```
 ## Contributors
 
 - [Ahlem Ben Abdallah ](https://github.com/ahlembenabdallah54)  
