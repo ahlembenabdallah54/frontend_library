@@ -1,9 +1,44 @@
-<<<<<<< HEAD
-# Vue 3 + Vite
+# Frontend for Library Management System
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## Description
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
-=======
-# frontend_library
->>>>>>> 10387d884ddf43aafe874fc840789e52ba146f80
+This frontend application is developed for a **Library Management System**.
+
+It provides an interface for users to interact with books, manage their accounts, and navigate the library platform.
+
+The system supports two types of users:
+
+- **Admins**
+  - Manage books
+  - Access administrative features
+
+- **Users**
+
+
+The application communicates with a backend API built with NestJS.
+
+Backend repository:  
+https://github.com/ahlembenabdallah54/backend_library
+
+---
+
+## Project Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+## Contributors
+
+- [Ahlem Ben Abdallah ](https://github.com/ahlembenabdallah54)  
+- [Islem Labidi](https://github.com/islemlabidi0)  
+
+
+---
+
+## License
+
+This project is licensed under the MIT License.
