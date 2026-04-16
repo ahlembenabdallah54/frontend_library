@@ -6,7 +6,5 @@ const app = createApp(App)
 
 app.use(router)
 
-// Remove or comment this line:
-// import './style.css'
 
 app.mount('#app')

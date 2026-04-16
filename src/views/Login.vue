@@ -68,7 +68,7 @@
             <label class="checkbox-label">
               <input type="checkbox" v-model="rememberMe" />
               <span class="checkbox-custom" />
-              <span class="checkbox-text">Remember me for 30 days</span>
+              <span class="checkbox-text">Remember me</span>
             </label>
           </div>
 
