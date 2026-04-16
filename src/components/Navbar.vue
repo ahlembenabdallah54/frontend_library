@@ -15,10 +15,10 @@
 
       <!-- CENTER LINKS -->
       <nav class="nav-links" v-if="!isMobile">
-        <router-link to="/" class="nav-link">Home</router-link>
-        <router-link to="/explore" class="nav-link">Explore</router-link>
-        <router-link to="/categories" class="nav-link">Categories</router-link>
-        <router-link to="/favourites" class="nav-link">Favourites</router-link>
+        <router-link v-for="link in navLinks" 
+        :key="link.path"
+        :to="link.path"
+        class="nav-link">{{ link.name }}</router-link>
       </nav>
 
       <!-- RIGHT SIDE -->
@@ -84,10 +84,9 @@
     <!-- Mobile menu -->
     <Transition name="mobile-menu">
       <div class="mobile-menu" v-if="isMobile && mobileOpen">
-        <router-link to="/" class="mobile-link" @click="mobileOpen = false">Home</router-link>
-        <router-link to="/explore" class="mobile-link" @click="mobileOpen = false">Explore</router-link>
-        <router-link to="/categories" class="mobile-link" @click="mobileOpen = false">Categories</router-link>
-        <router-link to="/favourites" class="mobile-link" @click="mobileOpen = false">Favourites</router-link>
+        <router-link v-for="link in navLinks" :key="link.path" :to="link.path" class="mobile-link" @click="mobileOpen = false">
+          {{ link.name }}
+        </router-link>
       </div>
     </Transition>
   </nav>
@@ -96,7 +95,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { currentUser, clearUser } from '../stores/auth'
+import { currentUser, clearUser , setUser} from '../stores/auth'
 
 const router = useRouter()
 const ddOpen = ref(false)
@@ -130,11 +129,52 @@ const handleClickOutside = (e) => {
 onMounted(() => {
   window.addEventListener('resize', handleResize)
   document.addEventListener('click', handleClickOutside)
+  const token =
+    localStorage.getItem('token') ||
+    sessionStorage.getItem('token')
+
+  if (token) {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+
+    setUser({
+      name: payload.username,
+      role: payload.role
+    })
+    router.push('/')
+
+  } catch (err) {
+    console.error("Invalid token")
+    clearUser()
+    router.push('/login')
+  }
+}
+  console.log("CURRENT USER:", currentUser.value)
+
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
   document.removeEventListener('click', handleClickOutside)
+})
+
+const isAdmin = computed(() => currentUser.value?.role === 'admin')
+
+const navLinks = computed(() => {
+  if (isAdmin.value) {
+    return [
+      { name: 'Home', path: '/' },
+      { name: 'Manage Books', path: '/books' },
+      { name: 'Manage Authors', path: '/authors' }
+    ]
+  }
+
+  return [
+    { name: 'Home', path: '/' },
+    { name: 'Explore', path: '/explore' },
+    { name: 'Categories', path: '/categories' },
+    { name: 'Favourites', path: '/favourites' }
+  ]
 })
 </script>
 

@@ -7,3 +7,26 @@
 body {
   background: #0a0502; /* match your dark theme */
 }
+:root {
+  --primary: #ff8a5b;
+  --secondary: #ea526f;
+  --background: #ffffff;
+  --soft-bg: #fceade;
+  --text: #25ced1;
+}
+
+/* Reset */
+body {
+  margin: 0;
+  color: #333;
+}
+
+/* Optional global headings */
+h1, h2, h3 {
+  margin: 0;
+}
+
+/* Optional links */
+a {
+  text-decoration: none;
+}
