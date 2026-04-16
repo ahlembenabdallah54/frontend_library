@@ -1,17 +1,26 @@
 <template>
-  <div class="container">
-    <h2>Edit Book</h2>
+  <div class="page">
 
-    <form @submit.prevent="updateBook" class="form">
+        <div class="card">
 
-      <input v-model="book.title" placeholder="Title" />
-      <input v-model="book.year" placeholder="Year" />
-      <input v-model="book.editor" placeholder="Author" />
+      <div class="header">
+        <h2 class="title">Edit Book</h2>
+        <p class="subtitle">Update your book details</p>
+      </div>
 
-      <button type="submit">Save Changes</button>
-    </form>
-  </div>
-</template>
+        <form @submit.prevent="updateBook" class="form">
+
+          <input v-model="book.title" placeholder="Title" />
+          <input v-model="book.year" placeholder="Year" />
+          <input v-model="book.editor" placeholder="Author" />
+
+           <button type="submit" :disabled="loading">
+          {{ loading ? "Saving..." : "Save Changes" }}
+        </button>
+        </form>
+      </div>
+      </div>
+  </template>
 
 <script setup>
 import { ref, onMounted } from "vue"
@@ -32,7 +41,12 @@ const book = ref({
 const fetchBook = async () => {
   try {
     const id = route.params.id
-    const res = await axios.get(`http://localhost:3000/books/search/${id}`)
+    const token = localStorage.getItem("token")
+    const res = await axios.get(`http://localhost:3000/books/search/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
 
     const data = Array.isArray(res.data) ? res.data[0] : res.data
 
@@ -55,7 +69,12 @@ const updateBook = async () => {
 
     await axios.put(
       `http://localhost:3000/books/edit/${id}`,
-      book.value
+      book.value,
+      {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+      }
     )
 
 // set flash message
@@ -69,7 +88,10 @@ router.push("/books")
   } catch (err) {
     router.push({
       path: "/books",
-      state: { updated: false }
+      state: { updated: false },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
     })
 
   } finally {
@@ -81,23 +103,44 @@ onMounted(fetchBook)
 </script>
 
 <style scoped>
-.container {
-  max-width: 520px;
-  margin: 70px auto;
-  padding: 30px;
-  background: linear-gradient(145deg, #ffffff, #f9fafb);
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f1f1f1;
+.page {
+  min-height: 100vh;
+  background: #0f0d0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
-h2 {
+/* CARD */
+.card {
+  width: 420px;
+  padding: 40px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(220, 155, 80, 0.15);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+}
+
+/* HEADER */
+.header {
   text-align: center;
   margin-bottom: 25px;
-  font-size: 22px;
-  font-weight: 700;
-  color: #333;
-  letter-spacing: 0.5px;
+}
+
+.title {
+  font-family: Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: #FAF0D8;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: rgba(200, 155, 100, 0.6);
+  margin-top: 6px;
 }
 
 /* FORM */
@@ -110,40 +153,43 @@ h2 {
 /* INPUTS */
 input {
   padding: 12px 14px;
-  border: 1px solid #e5e7eb;
   border-radius: 10px;
-  font-size: 14px;
-  transition: all 0.2s ease;
+  border: 1px solid rgba(220, 155, 80, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  color: #FAF0D8;
   outline: none;
-  background: #fff;
+  transition: 0.2s;
+}
+
+input::placeholder {
+  color: rgba(200, 155, 100, 0.4);
 }
 
 input:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  border-color: #FF7A2F;
+  box-shadow: 0 0 0 3px rgba(255, 122, 47, 0.15);
 }
 
 /* BUTTON */
 button {
   margin-top: 10px;
   padding: 12px;
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
-  color: white;
-  border: none;
   border-radius: 10px;
+  border: none;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.2s ease;
+  color: white;
+  background: linear-gradient(135deg, #FF7A2F, #E8521A);
+  transition: 0.2s;
 }
 
 button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 10px 25px rgba(232, 82, 26, 0.35);
 }
 
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
 }
 </style>

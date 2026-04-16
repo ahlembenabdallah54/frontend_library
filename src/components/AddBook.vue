@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="page">
     <div class="card">
       <div class="header">
         <h2>Add New Book</h2>
@@ -157,149 +157,117 @@ const addBook = async () => {
 </script>>
 
 <style scoped>
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8f4f0, #f0e6d9);
-  padding: 20px;
-  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0f0d0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
+/* CARD */
 .card {
-  background: white;
-  padding: 40px 70px;
-  border-radius: 24px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f5e6d3;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 450px;
+  padding: 40px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(220, 155, 80, 0.15);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
 }
 
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 45px rgba(234, 82, 111, 0.12);
-}
-
+/* HEADER */
 .header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 25px;
 }
 
-h2 {
-  color: #e85a6f;
+.title {
+  font-family: Georgia, serif;
   font-size: 28px;
-  font-weight: 700;
-  margin: 0 0 8px 0;
+  color: #FAF0D8;
+  font-weight: 400;
 }
 
 .subtitle {
-  color: #777;
-  font-size: 15px;
-  margin: 0;
+  font-size: 13px;
+  color: rgba(200, 155, 100, 0.6);
 }
 
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+/* FORM */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.form-group {
-  margin-bottom: 20px;
-}
-
-label {
+.form-group label {
+  color: rgba(250, 200, 140, 0.8);
+  font-size: 13px;
+  margin-bottom: 6px;
   display: block;
-  margin-bottom: 7px;
-  font-weight: 600;
-  color: #444;
-  font-size: 14.5px;
 }
 
+/* INPUTS */
 input {
   width: 100%;
-  padding: 13px 15px;
-  border: 2px solid #f5d9c4;
-  border-radius: 12px;
-  font-size: 16px;
-  background: #fffaf5;
-  transition: all 0.25s ease;
-  color: #333;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(220, 155, 80, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  color: #FAF0D8;
+  outline: none;
+}
+
+input::placeholder {
+  color: rgba(200, 155, 100, 0.4);
 }
 
 input:focus {
-  outline: none;
-  border-color: #e85a6f;
-  background: white;
-  box-shadow: 0 0 0 4px rgba(232, 90, 111, 0.15);
+  border-color: #FF7A2F;
+  box-shadow: 0 0 0 3px rgba(255,122,47,0.15);
 }
 
-small {
-  display: block;
-  margin-top: 6px;
-  color: #888;
-  font-size: 13px;
+/* ROW */
+.row {
+  display: flex;
+  gap: 12px;
 }
 
-.submit-btn {
-  width: 100%;
-  padding: 15px;
-  margin-top: 12px;
-  background: linear-gradient(135deg, #e85a6f, #f47c8c);
-  color: white;
+/* BUTTON */
+button {
+  margin-top: 10px;
+  padding: 13px;
   border: none;
-  border-radius: 12px;
-  font-size: 16.5px;
-  font-weight: 600;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #FF7A2F, #E8521A);
+  transition: 0.2s;
 }
 
-.submit-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(232, 90, 111, 0.3);
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(232, 82, 26, 0.35);
 }
 
-.submit-btn:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
-.submit-btn:disabled {
-  opacity: 0.75;
+button:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-.message {
-  margin-top: 20px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 500;
-  font-size: 15px;
-}
-
+/* MESSAGES */
 .success {
-  background: #d4f4e6;
-  color: #0f766e;
-  border: 1px solid #a1e4c9;
+  margin-top: 12px;
+  color: #34d399;
+  text-align: center;
 }
 
 .error {
-  background: #fee2e2;
-  color: #b91c1c;
-  border: 1px solid #f5b8b8;
-}
-
-@media (max-width: 500px) {
-  .card {
-    padding: 30px 20px;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-  }
+  margin-top: 12px;
+  color: #f87171;
+  text-align: center;
 }
 </style>
