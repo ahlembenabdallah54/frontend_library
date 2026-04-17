@@ -125,7 +125,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
-import { setUser } from '../stores/auth'   // ✅ NEW
+import { setUser } from '../stores/auth'   
 
 const router = useRouter()
 
@@ -146,9 +146,9 @@ const handleLogin = async () => {
 
     const token = response.data.access_token
 
-    // ✅ Decode JWT to extract user info
+    //  Decode JWT to extract user info
     const payload = JSON.parse(atob(token.split('.')[1]))
-    console.log('JWT payload:', payload) // 👈 check this in browser console once, then remove
+    console.log('JWT payload:', payload) //check this in browser console once, then remove
 
     if (rememberMe.value) {
       localStorage.setItem('token', token)
@@ -156,7 +156,7 @@ const handleLogin = async () => {
       sessionStorage.setItem('token', token)
     }
 
-    // ✅ Save user name so navbar can display it
+    //  Save user name so navbar can display it
     setUser({
       name: payload.name || payload.username || payload.sub
     })
