@@ -150,15 +150,12 @@ const handleLogin = async () => {
     const payload = JSON.parse(atob(token.split('.')[1]))
     console.log('JWT payload:', payload) //check this in browser console once, then remove
 
-    if (rememberMe.value) {
-      localStorage.setItem('token', token)
-    } else {
-      sessionStorage.setItem('token', token)
-    }
+    localStorage.setItem('token', token)
 
     //  Save user name so navbar can display it
     setUser({
-      name: payload.name || payload.username || payload.sub
+      name: payload.username ,
+      role: payload.role
     })
 
     router.push('/')
