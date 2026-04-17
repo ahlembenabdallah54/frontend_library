@@ -40,13 +40,13 @@
               id="editor"
               v-model.trim="form.editor"
               type="text"
-              placeholder="Scribner"
+              placeholder="F. Scott Fitzgerald"
               required
             />
           </div>
         </div>
 
-        <!-- img upload-->
+        <!-- Cover Image -->
         <div class="form-group">
           <label>Cover Image</label>
           <input
@@ -56,7 +56,7 @@
           />
         </div>
 
-        <!-- SUBMIT -->
+        <!-- SUBMIT BUTTON -->
         <button type="submit" :disabled="isLoading" class="submit-btn">
           {{ isLoading ? "Adding Book..." : "Add Book" }}
         </button>
@@ -77,29 +77,34 @@
 <script setup>
 import { reactive, ref } from "vue"
 import axios from "axios"
+import { useRouter } from "vue-router"
 
-/* FORM DATA */
+// Reactive form data
 const form = reactive({
   title: "",
   year: null,
   editor: ""
 })
 
-/* FILE */
+// File handling
 const file = ref(null)
 
-/* UI STATES */
+// UI states
 const successMessage = ref("")
 const errorMessage = ref("")
 const isLoading = ref(false)
 
-/* HANDLE FILE */
+// Router for redirection
+const router = useRouter()
+
+// Handle file selection
 const handleFile = (event) => {
   file.value = event.target.files[0]
 }
 
-/* ADD BOOK */
+// Add new book
 const addBook = async () => {
+  // Clear previous messages
   successMessage.value = ""
   errorMessage.value = ""
 
@@ -107,7 +112,7 @@ const addBook = async () => {
   const editor = form.editor.trim()
   const year = Number(form.year)
 
-  // validation
+  // Basic validation
   if (!title || !editor || !year || isNaN(year)) {
     errorMessage.value = "Please fill all required fields correctly"
     return
@@ -118,7 +123,6 @@ const addBook = async () => {
 
   try {
     const formData = new FormData()
-
     formData.append("title", title)
     formData.append("year", year)
     formData.append("editor", editor)
@@ -127,34 +131,41 @@ const addBook = async () => {
       formData.append("image", file.value)
     }
 
+    // Send request to backend
     await axios.post("http://localhost:3000/books/new", formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       }
     })
 
-    successMessage.value = "Book added successfully! "
+    // Success
+    successMessage.value = "Book added successfully!"
 
-    // RESET FORM
+    // Reset form
     form.title = ""
     form.year = null
     form.editor = ""
     file.value = null
 
-    // reset file input visually
-    document.querySelector('input[type="file"]').value = ""
+    // Reset file input visually
+    const fileInput = document.querySelector('input[type="file"]')
+    if (fileInput) fileInput.value = ""
+
+    // Redirect to All Books page after short delay
+    setTimeout(() => {
+      router.push("/books")     // ← Change this path if your All Books route is different
+    }, 1500)
 
   } catch (error) {
     console.error("Add book error:", error)
-
-    errorMessage.value =
-      error.response?.data?.message ||
-      "Failed to add book"
+    errorMessage.value = 
+      error.response?.data?.message || 
+      "Failed to add book. Please try again."
   } finally {
     isLoading.value = false
   }
 }
-</script>>
+</script>
 
 <style scoped>
 .page {
@@ -167,7 +178,6 @@ const addBook = async () => {
   font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
-/* CARD */
 .card {
   width: 450px;
   padding: 40px;
@@ -177,17 +187,17 @@ const addBook = async () => {
   box-shadow: 0 20px 50px rgba(0,0,0,0.4);
 }
 
-/* HEADER */
 .header {
   text-align: center;
   margin-bottom: 25px;
 }
 
-.title {
+h2 {
   font-family: Georgia, serif;
   font-size: 28px;
   color: #FAF0D8;
   font-weight: 400;
+  margin: 0 0 8px 0;
 }
 
 .subtitle {
@@ -195,7 +205,6 @@ const addBook = async () => {
   color: rgba(200, 155, 100, 0.6);
 }
 
-/* FORM */
 form {
   display: flex;
   flex-direction: column;
@@ -209,7 +218,6 @@ form {
   display: block;
 }
 
-/* INPUTS */
 input {
   width: 100%;
   padding: 12px 14px;
@@ -229,14 +237,16 @@ input:focus {
   box-shadow: 0 0 0 3px rgba(255,122,47,0.15);
 }
 
-/* ROW */
-.row {
+.form-row {
   display: flex;
   gap: 12px;
 }
 
-/* BUTTON */
-button {
+.form-row .form-group {
+  flex: 1;
+}
+
+.submit-btn {
   margin-top: 10px;
   padding: 13px;
   border: none;
@@ -248,26 +258,27 @@ button {
   transition: 0.2s;
 }
 
-button:hover {
+.submit-btn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 10px 25px rgba(232, 82, 26, 0.35);
 }
 
-button:disabled {
+.submit-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* MESSAGES */
-.success {
+.message {
   margin-top: 12px;
-  color: #34d399;
   text-align: center;
+  font-weight: 500;
+}
+
+.success {
+  color: #34d399;
 }
 
 .error {
-  margin-top: 12px;
   color: #f87171;
-  text-align: center;
 }
 </style>
