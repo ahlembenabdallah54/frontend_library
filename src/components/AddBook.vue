@@ -88,7 +88,7 @@ const form = reactive({
 
 // File handling
 const file = ref(null)
-
+const token = localStorage.getItem("token")
 // UI states
 const successMessage = ref("")
 const errorMessage = ref("")
@@ -134,7 +134,8 @@ const addBook = async () => {
     // Send request to backend
     await axios.post("http://localhost:3000/books/new", formData, {
       headers: {
-        "Content-Type": "multipart/form-data"
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`
       }
     })
 

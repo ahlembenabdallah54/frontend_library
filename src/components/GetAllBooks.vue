@@ -26,13 +26,6 @@
         <div class="book-cover">
           <img :src="getImageUrl(book.image)" :alt="book.title" />
 
-          <!-- Favorite Emoji -->
-          <button 
-            class="favorite-btn"
-            @click.stop="toggleFavorite(book)"
-          >
-            {{ book.isFavorite ? '❤️' : '♡' }}
-          </button>
 
           <!-- ACTIONS OVERLAY -->
           <div class="actions-overlay">
@@ -129,11 +122,6 @@ const fetchBooks = async () => {
   }
 }
 
-/* FAVORITE */
-const toggleFavorite = (book) => {
-  book.isFavorite = !book.isFavorite
-  // You can later add API call here if needed
-}
 
 /* NAVIGATION */
 const goToAdd = () => router.push('/addBook')
@@ -218,8 +206,6 @@ onMounted(async () => {
 
 .book-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(255, 140, 66, 0.3);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 /* COVER */

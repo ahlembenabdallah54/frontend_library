@@ -6,7 +6,7 @@ import Home from '../views/Home.vue'
 
 // Components
 import AddBook from '../components/AddBook.vue'
-import BookList from '../components/GetAllBooks.vue'     // This is your Manage Books (Admin)
+import BookList from '../components/GetAllBooks.vue'
 import EditBook from '../components/EditBook.vue'
 import ExploreBooks from '../components/ExploreBooks.vue'
 
@@ -38,7 +38,7 @@ const routes = [
   {
     path: '/books',
     name: 'ManageBooks',
-    component: BookList          // Your current "Manage Books" page
+    component: BookList
   },
   {
     path: '/edit/:id',
@@ -52,12 +52,10 @@ const routes = [
     name: 'Explore',
     component: ExploreBooks
   },
-
- {
-  path: '/book/:id',
-  name: 'BookDetail',
-  component: () => import('../components/BookDetail.vue')   
-},
+{
+  path: '/favorites', // route to user's favorite books
+  component: () => import('../components/Favorites.vue')
+}
 ]
 
 const router = createRouter({

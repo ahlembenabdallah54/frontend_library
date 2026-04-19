@@ -17,7 +17,7 @@
             class="favorite-btn"
             @click.stop="toggleFavorite(book)"
           >
-            {{ book.isFavorite ? '❤️' : '♡' }}
+            <span :class="favorites[book.id] ? 'heart active' : 'heart'">♥</span>
           </button>
 
           <div class="actions-overlay">
@@ -44,6 +44,8 @@ import axios from 'axios'
 
 const books = ref([])
 const loading = ref(true)
+const favorites = ref({})
+const token = localStorage.getItem("token")
 
 const getImageUrl = (image) => {
   if (!image) return ''
@@ -61,14 +63,84 @@ const fetchBooks = async () => {
   }
 }
 
-/* Favorite Toggle */
-const toggleFavorite = (book) => {
-  book.isFavorite = !book.isFavorite
-  // You can add API call here later if needed
+// check favorites for all books
+const checkFavorites = async () => {
+  try {
+    for (const book of books.value) {
+      const res = await axios.get(
+        `http://localhost:3000/books/favorites/${book.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+      favorites.value[book.id] = res.data.isFavorite
+    }
+  } catch (err) {
+    console.error('Error checking favorites:', err)
+  }
 }
+// toggle favorite
+const toggleFavorite = async (book) => {
+  const id = book.id
 
-/* INIT */
-onMounted(fetchBooks)
+  try {
+    if (favorites.value[id]) {
+      await axios.delete(`http://localhost:3000/books/favorites/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      showToast('Removed from favorites')
+    } else {
+      await axios.post(
+        `http://localhost:3000/books/favorites/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+      showToast('Added to favorites')
+    }
+
+    // update UI instantly
+    favorites.value[id] = !favorites.value[id]
+
+  } catch (err) {
+    console.error('Failed to toggle favorite:', err)
+    showToast('Failed to update favorites')
+  }
+}
+// toast
+const showToast = (message) => {
+  const toast = document.createElement('div')
+  toast.className = 'toast success'
+  toast.textContent = message
+
+  toast.style.position = 'fixed'
+  toast.style.bottom = '20px'
+  toast.style.left = '50%'
+  toast.style.transform = 'translateX(-50%)'
+  toast.style.padding = '14px 24px'
+  toast.style.borderRadius = '10px'
+  toast.style.background = '#10b981'
+  toast.style.color = 'white'
+  toast.style.zIndex = '99999'
+
+  document.body.appendChild(toast)
+
+  setTimeout(() => {
+    toast.style.opacity = '0'
+    setTimeout(() => toast.remove(), 300)
+  }, 2500)
+}
+onMounted(async () => {
+  await fetchBooks()
+  await checkFavorites()
+})
 </script>
 
 <style scoped>
@@ -109,14 +181,10 @@ onMounted(fetchBooks)
   border: 1px solid rgba(220, 155, 80, 0.12);
   border-radius: 14px;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
-.book-card:hover {
-  transform: translateY(-8px);
-  border-color: rgba(255, 140, 66, 0.4);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-}
+
 
 .book-cover {
   position: relative;
@@ -139,18 +207,22 @@ onMounted(fetchBooks)
   position: absolute;
   top: 12px;
   right: 12px;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.6);
   border: none;
-  font-size: 1.6rem;
-  padding: 4px 10px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 10;
-  transition: transform 0.2s;
+  transition: all 0.2s ease;
 }
 
 .favorite-btn:hover {
-  transform: scale(1.3);
+  transform: scale(1.15);
+  background: rgba(0, 0, 0, 0.8);
 }
 
 /* Overlay (kept empty as requested) */
@@ -165,9 +237,7 @@ onMounted(fetchBooks)
   transition: opacity 0.3s;
 }
 
-.book-card:hover .actions-overlay {
-  opacity: 1;
-}
+
 
 .book-body {
   padding: 16px;
@@ -190,5 +260,16 @@ onMounted(fetchBooks)
   padding: 80px 20px;
   color: #FF8C42;
   font-size: 1.1rem;
+}
+.heart {
+  font-size: 18px;
+  color: #aaa;
+  transition: all 0.2s ease;
+}
+
+.heart.active {
+  color: #ff4d6d;
+  transform: scale(1.2);
+  text-shadow: 0 0 10px rgba(255, 77, 109, 0.6);
 }
 </style>

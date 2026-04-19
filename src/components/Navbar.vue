@@ -178,7 +178,7 @@ const navLinks = computed(() => {
   return [
     { name: 'Home', path: '/' },
     { name: 'Explore', path: '/explore' },
-    { name: 'Favourites', path: '/favourites' }
+    { name: 'Favorites', path: '/favorites' }
   ]
 })
 </script>
