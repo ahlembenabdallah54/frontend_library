@@ -4,7 +4,7 @@
 
 This frontend application is developed for a **Library Management System**.
 
-It provides an interface for users to interact with books, manage their accounts, and navigate the library platform.
+It provides an interface for users to interact with books,and navigate the library platform.
 
 The system supports two types of users:
 
@@ -13,6 +13,8 @@ The system supports two types of users:
   - Access administrative features
 
 - **Users**
+  - Explore Books
+  - Add and remove favorite books
 
 
 The application communicates with a backend API built with NestJS.
